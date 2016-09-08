@@ -7,7 +7,7 @@ $(document).ready(function() {
   var current = null,
       points = 0;
 
-  function getNext() {
+  function getNextQuestion() {
     $.get(
       'next',
       {},
@@ -24,20 +24,16 @@ $(document).ready(function() {
 
         $('.info').empty();
         $('.info').append(type).append(elem);
+        attachEvents();
       },
       'json'
     );
   }
-  $( document ).ajaxStart(function() {
-    $('.loader').fadeIn('fast');
-  });
-  $( document ).ajaxComplete(function() {
-    $('.loader').fadeOut('fast');
-  });
 
-  $('.options').on('click', function(e) {
+  function checkAnswer(elem) {
+    detachEvents();
     $.get(
-      'check/' + $(this).data('id'),
+      'check/' + elem.data('id'),
       function(data) {
         if(data.status == true) {
           notie.alert('success', "That's Right!", 2);
@@ -51,12 +47,38 @@ $(document).ready(function() {
         }
         $('.points').html(points);
           window.setTimeout(function() {
-            getNext();
+            getNextQuestion();
           }, 2000);
       }
     );
+  }
+
+  function attachEvents() {
+    console.log('attach');
+    $('.options').on('click', function(e) {
+      checkAnswer($(this));
+    });
+  }
+
+  function detachEvents() {
+    console.log('detach');
+    $('.options').unbind('click');
+  }
+
+  $('.js-start-game').on('click', function(e) {
+    $('.intro').fadeOut('fast');
+    getNextQuestion();
   });
 
-  getNext();
+  $( document ).ajaxStart(function() {
+    $('.loader').fadeIn('fast');
+  });
+  $( document ).ajaxComplete(function() {
+    $('.loader').fadeOut('fast');
+  });
+
+  $('.options').on('click', function(e) {
+    attachEvents();
+  });
 
 });
