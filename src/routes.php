@@ -1,6 +1,16 @@
 <?php
 // Routes
 
+$app->options('/{routes:.+}', function ($request, $response, $args) {
+  return $response;
+});
+
+$app->add(function ($req, $res, $next) {
+  $response = $next($req, $res);
+  return $response
+    ->withHeader('Access-Control-Allow-Origin', '*');
+});
+
 $app->get('/', function ($request, $response, $args) {
   $return = array(
     'status' => FALSE,
@@ -74,3 +84,9 @@ $app->get('/next', function ($request, $response, $args) {
 
     return $response->withJson($return, 201);
 });
+
+$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function($req, $res) {
+    $handler = $this->notFoundHandler; // handle using the default Slim page not found handler
+    return $handler($req, $res);
+});
+
