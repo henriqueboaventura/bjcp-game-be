@@ -47,7 +47,8 @@ $app->get('/next', function ($request, $response, $args) {
     $return = [
       'type' => ucfirst($type),
       'content' => $content->__toString(),
-      'options' => NULL
+      'options' => NULL,
+      'answer' => $style->attributes()->id->__toString()
     ];
     $options = [];
     $options[] = [
