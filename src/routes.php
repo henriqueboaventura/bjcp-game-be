@@ -1,36 +1,24 @@
 <?php
 // Routes
-//session_start();
-$app->get('/', function () use ($app) {
-    return $app->render('index.phtml');
-});
 
-$app->get('/check/:id', function ($id) use ($app) {
+$app->get('/check/{id}', function ($request, $response, $args) {
   $return = array(
     'status' => FALSE,
     'id' => $_SESSION['current']['id'],
     'style' => $_SESSION['current']['name']
   );
-  if($_SESSION['current']['id'] == $id) {
+  if($_SESSION['current']['id'] == $args['id']) {
     $return['status'] = TRUE;
   }
 
-  $response = $app->response();
-  $response['Content-Type'] = 'application/json';
-  $response->status(200);
-  $response->body(json_encode($return));
+  return $response->withJson($return, 201);
 });
 
-$app->get('/next', function () use ($app) {
+$app->get('/next', function ($request, $response, $args) {
     $xml = new SimpleXMLElement(file_get_contents(__DIR__ . '/../resources/styleguide.xml'));
 
     $category = $xml->class[0]->category[rand(0, $xml->class[0]->category->count()-1)];
     $style = $category->subcategory[rand(0,$category->subcategory->count()-1)];
-
-    $_SESSION['current'] = array(
-      'id' => $style->attributes()->id->__toString(),
-      'name' => $style->name->__toString(),
-    );
 
     $types = [
       'aroma',
@@ -59,7 +47,6 @@ $app->get('/next', function () use ($app) {
     while(count($options) < 4) {
       $category = $xml->class[0]->category[rand(0, $xml->class[0]->category->count()-1)];
       $style = $category->subcategory[rand(0,$category->subcategory->count()-1)];
-      // $attributes = $style->attributes();
       if(!in_array($style->id, $taken)){
         $options[] = [
           'id' => $style->attributes()->id->__toString(),
@@ -71,8 +58,5 @@ $app->get('/next', function () use ($app) {
     shuffle($options);
     $return['options'] = $options;
 
-    $response = $app->response();
-    $response['Content-Type'] = 'application/json';
-    $response->status(200);
-    $response->body(json_encode($return));
+    return $response->withJson($return, 201);
 });
