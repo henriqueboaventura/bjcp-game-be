@@ -1,6 +1,19 @@
 <?php
 // Routes
 
+$app->get('/', function ($request, $response, $args) {
+  $return = array(
+    'status' => FALSE,
+    'id' => $_SESSION['current']['id'],
+    'style' => $_SESSION['current']['name']
+  );
+  if($_SESSION['current']['id'] == $args['id']) {
+    $return['status'] = TRUE;
+  }
+
+  return $response->write('Please use the <em>check</em> or <em>next</em> endpoint');
+});
+
 $app->get('/check/{id}', function ($request, $response, $args) {
   $return = array(
     'status' => FALSE,
